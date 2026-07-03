@@ -1,11 +1,11 @@
 /**
- * REKABETÇİ ŞEHİR/ÇİFTLİK OYUNU - MİKRO MODÜL 1 - 3
+ * REKABETÇİ ŞEHİR/ÇİFTLİK OYUNU - MİKRO MODÜL 1 - 3 (GitHub Pages Uyumlu Sürüm)
  * Modül 1: Phaser 3 Canvas kurulumu ve mobil ölçekleme (FIT).
  * Modül 2: HTML5 Web Audio Context Güvenlik Kilidi.
- * Modül 3: Boot / Yükleme Ekranı ve Grafik İlerleme Çubuğu (Preloader).
+ * Modül 3: Güvenli Geri Sayımlı Yükleme Ekranı ve Grafik İlerleme Çubuğu.
  */
 
-// MODÜL 3: Yükleme ve Hazırlık Sahnesi
+// MODÜL 3: Yükleme ve Hazırlık Sahnesi (GitHub Uyumlu)
 class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BootScene' });
@@ -18,13 +18,13 @@ class BootScene extends Phaser.Scene {
         const height = this.cameras.main.height;
 
         // Yükleniyor Yazısı
-        let loadingText = this.add.text(width / 2, height / 2 - 50, 'Varlıklar Yükleniyor...', {
+        this.loadingText = this.add.text(width / 2, height / 2 - 50, 'Varlıklar Yükleniyor...', {
             font: '20px Arial',
             fill: '#ffffff'
         }).setOrigin(0.5);
 
         // Yüzde Yazısı
-        let percentText = this.add.text(width / 2, height / 2, '0%', {
+        this.percentText = this.add.text(width / 2, height / 2, '0%', {
             font: '18px Arial',
             fill: '#f6ad55'
         }).setOrigin(0.5);
@@ -35,41 +35,47 @@ class BootScene extends Phaser.Scene {
         progressBg.fillRect(width / 2 - 100, height / 2 + 30, 200, 20);
 
         // Dinamik Dolan Yükleme Çubuğu (Turuncu Kutu)
-        let progressBar = this.add.graphics();
+        this.progressBar = this.add.graphics();
 
-        // Phaser'ın yükleme ilerleme (progress) dinleyicisi
-        this.load.on('progress', function (value) {
-            percentText.setText(parseInt(value * 100) + '%');
-            progressBar.clear();
-            progressBar.fillStyle(0xdd6b20, 1);
-            // İlerlemeye göre turuncu barın genişliğini artır
-            progressBar.fillRect(width / 2 - 100, height / 2 + 30, 200 * value, 20);
+        // GitHub Pages üzerinde takılmayı önlemek için zamana bağlı güvenli yükleme simülasyonu
+        let progressValue = 0;
+        
+        this.time.addEvent({
+            delay: 30, // Her 30 milisaniyede bir barı doldur (Yaklaşık 1.5 saniye sürer)
+            callback: () => {
+                progressValue += 0.02; // İlerleme adım büyüklüğü
+                
+                // Geliştirilmiş Koşul Bloğu (Taşma engelleme ve Erken Dönüş)
+                if (progressValue >= 1) {
+                    progressValue = 1;
+                    
+                    // Son kez arayüzü %100 olarak güncelle ve çiz
+                    this.percentText.setText('100%');
+                    this.progressBar.clear();
+                    this.progressBar.fillStyle(0xdd6b20, 1);
+                    this.progressBar.fillRect(width / 2 - 100, height / 2 + 30, 200, 20);
+                    
+                    console.log("Yükleme başarıyla tamamlandı, sahne değiştiriliyor.");
+                    this.scene.start('GameScene');
+                    return;
+                }
+
+                // Normal İlerleme Çizimi
+                this.percentText.setText(parseInt(progressValue * 100) + '%');
+                this.progressBar.clear();
+                this.progressBar.fillStyle(0xdd6b20, 1);
+                this.progressBar.fillRect(width / 2 - 100, height / 2 + 30, 200 * progressValue, 20);
+            },
+            repeat: 49// Toplamda 50 adımda %100'e ulaşır
         });
-
-        // Yükleme tamamlandığında tetiklenecek event
-        this.load.on('complete', () => {
-            loadingText.destroy();
-            percentText.destroy();
-            progressBar.destroy();
-            progressBg.destroy();
-            
-            // Ana oyun sahnesine güvenli geçiş yap
-            this.scene.start('GameScene');
-        });
-
-        // Modül 3'te henüz büyük asset'ler olmadığı için 
-        // yükleme çubuğunun doluşunu simüle etmek adına sahte küçük dosyalar yüklüyoruz
-        for (let i = 0; i < 25; i++) {
-            this.load.image('fake_asset_' + i, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
-        }
     }
 
     create() {
-        // Preload içindeki 'complete' eventi sahneyi değiştireceği için burası boş kalabilir
+        // Zamanlayıcı geçişi yönettiği için burası boş kalabilir
     }
 }
 
-// Ana Oyun Sahnesi
+// Ana Oyun Sahnesi (Modül 1 ve 2 Özellikleri Korunuyor)
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
@@ -79,13 +85,13 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#2d3748');
 
         this.statusText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 
-            '✅ Modül 3: Yükleme Tamamlandı!\nAna Sahne Aktif.\n\nSes Kilidi İçin Dokunun.', {
+            '✅ Modül 3: Yükleme Tamamlandı!\nAna Sahne Kesin Olarak Aktif.\n\nSes Kilidi İçin Dokunun.', {
             font: 'bold 16px Arial',
             fill: '#48bb78',
             align: 'center'
         }).setOrigin(0.5);
 
-        // Modül 2'den gelen ses kilidi mekanizmasını koruyoruz
+        // Modül 2'den gelen ses kilidi mekanizması eksiksiz korunuyor
         this.input.once('pointerdown', () => {
             if (this.sound && this.sound.context && this.sound.context.state === 'suspended') {
                 this.sound.context.resume();
@@ -93,11 +99,11 @@ class GameScene extends Phaser.Scene {
             this.statusText.setText('✅ Modül 3: Sistem Hazır!\n(Yükleme ve Ses Başarılı)');
         });
 
-        console.log("Modül 3 Başarıyla Çalıştı: Geçiş sahnesi tamamlandı.");
+        console.log("Modül 3 Başarıyla Çalıştı: GitHub Pages uyumlu güvenli geçiş yapıldı.");
     }
 }
 
-// Phaser 3 Konfigürasyon Ayarları
+// Phaser 3 Konfigürasyon Ayarları (Modül 1 Korunuyor)
 const config = {
     type: Phaser.AUTO,
     parent: 'game-container',
@@ -107,7 +113,6 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    // ÖNEMLİ: BootScene ilk sırada olmalı ki oyun onunla başlasın
     scene: [BootScene, GameScene]
 };
 
